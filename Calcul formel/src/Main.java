@@ -10,7 +10,11 @@ public class Main {
 		Operateur.putOperateur(new Division ());
 		Operateur.putOperateur(new Oppose ());
 		
-		Expression e = new Expression (new Entier (7)).inverse().additionner(new Expression (new Rationnel (2, 5))).additionner(new Expression (new Entier (5)));
+		Expression e = new Expression (new Entier (5));
+		e = e.additionner(new Expression (7));
+		e = e.multiplier(new Expression (9));
+		e = e.diviser(new Expression (8));
+		
 		System.out.println(e);
 	}
 

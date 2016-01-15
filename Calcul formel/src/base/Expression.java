@@ -15,6 +15,10 @@ public class Expression implements Operable<Expression> {
 		this (null, null, v);
 	}
 	
+	public Expression (int n){
+		this (new Entier (n));
+	}
+	
 	public Expression getGauche (){
 		return this.gauche;
 	}
@@ -32,47 +36,43 @@ public class Expression implements Operable<Expression> {
 	public Expression additionner(Expression a) {
 		return new Expression (this.clone(), a, Operateur.getOperateur("+", true));
 	}
-	@Override
-	public Expression inverse() {
-		return new Expression (new Expression (new Entier (1)), this.clone(), Operateur.getOperateur("/", true));
-	}
+	
 	@Override
 	public Expression multiplier(Expression a) {
 		return new Expression (this.clone(), a, Operateur.getOperateur("*", true));
 	}
 	
 	public Expression clone (){
-		if (this.gauche == null && this.droite == null && (this.valeur instanceof Rationnel || this.valeur instanceof Entier)){
-			if (this.valeur instanceof Entier){
-				Entier e = (Entier)this.valeur;
-				return new Expression (e.multiplier(new Entier (1)));
-			}else{
-				Rationnel r = (Rationnel)this.valeur;
-				return new Expression (r.multiplier(new Rationnel (1, 1)));
-			}
-		}else
+		if (this.gauche == null && this.droite == null && this.valeur instanceof Entier)
+			return new Expression (((int)((Entier)this.valeur).getValeur()));
+		else
 			return new Expression (this.gauche.clone(), this.droite.clone(), this.valeur);
 	}
 	
 	private String toString (int p){
 		String g = "", d = "", v = this.valeur.toString(), r = "";
+		int np = this.valeur instanceof Operateur ? ((Operateur)this.valeur).getPriorite() : p;
+
 		if (this.gauche != null)
-			g = this.gauche.toString(p);
+			g = this.gauche.toString(np);
 		if (this.droite != null)
-			d = this.droite.toString(p);
+			d = this.droite.toString(np);
 		r = g + v + d;
 		if (this.valeur instanceof Operateur){
 			Operateur o = (Operateur)this.valeur;
-			if ((o.getPriorite() < p && p >= 0)
-					|| !o.estAssociatif())
+			if (p >= 0 && (np < p || !o.estAssociatif()))
 				r = "(" + r + ")";
 		}
-		if (this.valeur instanceof Rationnel && Operateur.getOperateur("/", true).getPriorite() <= p)
-			r = "(" + r + ")";
+
 		return r;
 	}
 	
 	public String toString (){
 		return this.toString(-1);
+	}
+
+	@Override
+	public Expression diviser(Expression a) {
+		return new Expression (this.clone(), a.clone(), Operateur.getOperateur("/", true));
 	}
 }

@@ -18,11 +18,6 @@ public class Entier extends Constante implements Operable<Entier>{
 	}
 
 	@Override
-	public Rationnel inverse() {
-		return new Rationnel (1, this.n);
-	}
-
-	@Override
 	public Entier multiplier(Entier a) {
 		
 		return new Entier (this.n * a.n);
@@ -38,6 +33,13 @@ public class Entier extends Constante implements Operable<Entier>{
 
 	public int compareTo(Entier a) {
 		return this.n - a.n;
+	}
+
+	@Override
+	public Entier diviser(Entier a) {
+		if (this.n % a.n != 0)
+			throw new RuntimeException (this.toString() + " n'est pas divisible par " + a);
+		return new Entier (this.n / a.n);
 	}
 
 }
