@@ -9,7 +9,12 @@ public class Expression implements Operable<Expression> {
 	public Expression (Expression g, Expression d, Noeud v){
 		this.gauche = g;
 		this.droite = d;
-
+		
+		//	Si l'entier est négatif
+		if (v instanceof Entier && ((Entier)v).compareTo(new Entier (0)) < 0){
+			this.valeur = Operateur.getOperateur("-", false);
+			this.droite = new Expression (-(int)((Entier)v).getValeur());
+		}
 		this.valeur = v;
 	}
 	
@@ -158,10 +163,14 @@ public class Expression implements Operable<Expression> {
 				//TODO : Traiter le cas de la fonction
 			//	Si on a rencontré un opérateur
 			}else{
-				Expression gauche = this.build(this.vuePropre(list, 0, dernierOperateurIndice - 1));
+				Expression gauche = null;
+				if (dernierOperateurIndice != 0)
+					gauche = this.build(this.vuePropre(list, 0, dernierOperateurIndice - 1));
 				Expression droite = this.build(this.vuePropre(list, dernierOperateurIndice + 1, list.size() - 1));
 				
-				return new Expression (gauche, droite, dernierOperateur);
+				Operateur operateur = Operateur.getOperateur(dernierOperateur.getSymbole(), gauche != null);
+				
+				return new Expression (gauche, droite, operateur);
 			}
 		}
 		private List<String> vuePropre (List<String> liste, int min, int max){
