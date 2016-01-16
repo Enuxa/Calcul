@@ -6,7 +6,7 @@ public class Main {
 		Operateur.chargerOperateurs();
 		ConstanteFixe.chargerConstantes();
 		
-		Expression exp = Expression.build("e");
+		Expression exp = Expression.build("(1-1-1)^2");
 		System.out.println(exp + "=" + exp.evaluer());
 	}
 

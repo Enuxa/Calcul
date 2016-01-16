@@ -122,7 +122,7 @@ public class Expression implements Operable<Expression> {
 			return this.tokens.toString();
 		}
 		public Expression build (){
-			return this.build(this.tokens);
+			return this.build(this.vuePropre (this.tokens, 0, this.tokens.size() - 1));
 		}
 		private Expression build (List<String> list){
 			int nbParentheses = 0;
@@ -135,11 +135,11 @@ public class Expression implements Operable<Expression> {
 					nbParentheses++;
 				else if (t.equals("("))
 					nbParentheses--;
-				//	Si on rencontre un opÃ©rateur hors des parenthÃ¨ses
+				//	Si on rencontre un opérateur hors des parenthèses
 				else if (nbParentheses == 0 && Operateur.hasOperateur(t)){
 					Operateur op = Operateur.getOperateur(t);
-					//	Si cet opÃ©rateur est de prioritÃ© supÃ©rieure au dernier rencontrÃ©
-					if (dernierOperateur != null && op.getPriorite() > dernierOperateur.getPriorite())
+					//	Si cet opérateur est de priorité supérieure ou égale au dernier rencontré
+					if (dernierOperateur != null && op.getPriorite() >= dernierOperateur.getPriorite())
 						continuer = false;
 					else{
 						dernierOperateur = op;
@@ -149,7 +149,7 @@ public class Expression implements Operable<Expression> {
 				i--;
 			}
 			
-			//	Si on n'a rencontrÃ© aucun opÃ©rateur, on suppose qu'il n'y a qu'un seul token
+			//	Si on n'a rencontré aucun opérateur, on suppose qu'il n'y a qu'un seul token
 			if (i < 0 && dernierOperateur == null){
 				String token = list.get(0);
 				if (ConstanteFixe.hasConstante(token))
@@ -157,7 +157,7 @@ public class Expression implements Operable<Expression> {
 				else
 					return new Expression (Integer.valueOf(token));
 				//TODO : Traiter le cas de la fonction
-			//	Si on a rencontrÃ© un opÃ©rateur (Ã  la position i)
+			//	Si on a rencontré un opérateur
 			}else{
 				Expression gauche = this.build(this.vuePropre(list, 0, dernierOperateurIndice - 1));
 				Expression droite = this.build(this.vuePropre(list, dernierOperateurIndice + 1, list.size() - 1));
