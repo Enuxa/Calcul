@@ -1,13 +1,18 @@
 import base.*;
+import java.util.*;
 
 public class Main {
 
 	public static void main(String[] args) {
 		Operateur.chargerOperateurs();
 		ConstanteFixe.chargerConstantes();
+				
+		Scanner sc = new Scanner (System.in);
 		
-		Expression exp = Expression.build("(1-1-1)^2");
-		System.out.println(exp + "=" + exp.evaluer());
+		while (true){
+			Expression exp = Expression.build(sc.nextLine());
+			System.out.println(exp + "=" + exp.evaluer());
+		}
 	}
 
 }

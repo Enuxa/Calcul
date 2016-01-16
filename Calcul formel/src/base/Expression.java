@@ -55,18 +55,17 @@ public class Expression implements Operable<Expression> {
 			return new Expression (this.gauche.clone(), this.droite.clone(), this.valeur);
 	}
 	
-	private String toString (int p){
+	private String toString (Operateur op0, int membre){
 		String g = "", d = "", v = this.valeur.toString(), r = "";
-		int np = this.valeur instanceof Operateur ? ((Operateur)this.valeur).getPriorite() : p;
+		Operateur op1 = this.valeur instanceof Operateur ? (Operateur)this.valeur : op0;
 
 		if (this.gauche != null)
-			g = this.gauche.toString(np);
+			g = this.gauche.toString(op1, -1);
 		if (this.droite != null)
-			d = this.droite.toString(np);
+			d = this.droite.toString(op1, 1);
 		r = g + v + d;
 		if (this.valeur instanceof Operateur){
-			Operateur o = (Operateur)this.valeur;
-			if (p >= 0 && (np < p || !o.estAssociatif()))
+			if (op0 != null && (op1.getPriorite() < op0.getPriorite() || (!op0.estAssociatif() && membre == 1)))
 				r = "(" + r + ")";
 		}
 
@@ -74,7 +73,7 @@ public class Expression implements Operable<Expression> {
 	}
 	
 	public String toString (){
-		return this.toString(-1);
+		return this.toString(null, 0);
 	}
 
 	@Override
@@ -166,11 +165,26 @@ public class Expression implements Operable<Expression> {
 			}
 		}
 		private List<String> vuePropre (List<String> liste, int min, int max){
-			List<String> l = liste.subList(min, max + 1);
-			int n = 0;
-			while (l.size() >= 2 * n && l.get(n).equals("(") && l.get(l.size() - 1 - n).equals(")"))
-				n++;
-			return l.subList(n, l.size () - n);
+			liste = liste.subList(min, max + 1);
+			boolean continuer = true;
+			while (continuer && liste.get(0).equals("(") && liste.get(liste.size() - 1).equals(")")){
+				int n = 0;
+				for (int i = 1; i < liste.size() - 1; i++){
+					String t = liste.get(i);
+					if (t.equals("("))
+						n++;
+					else if (t.equals(")"))
+						n--;
+					//	Si le parenthésage est incorrect en ne considérant pas la première parenthèse ouvrante
+					if (n < 0)
+						continuer = false;
+				}
+				if (n == 0 && continuer)
+					liste = liste.subList(1, liste.size() - 1);
+				else
+					continuer = false;
+			}
+			return liste;
 		}
 	}
 }
