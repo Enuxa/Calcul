@@ -2,6 +2,13 @@ package base;
 
 import java.util.*;
 
+import Operateurs.Addition;
+import Operateurs.Division;
+import Operateurs.Exponentiation;
+import Operateurs.Multiplication;
+import Operateurs.Oppose;
+import Operateurs.Soustraction;
+
 public abstract class Operateur implements Noeud {
 	private String symbole;
 	private boolean binaire, associatif;
@@ -33,7 +40,7 @@ public abstract class Operateur implements Noeud {
 
 	public Expression simplifier (Expression e){
 		if (e.getValeur() != this)
-			throw new RuntimeException ("L'operateur utilisé pour simplifier l'expression n'est pas la valeur du noeud " + e);
+			throw new RuntimeException ("L'operateur utilisï¿½ pour simplifier l'expression n'est pas la valeur du noeud " + e);
 		return null;
 	}
 	
@@ -47,7 +54,7 @@ public abstract class Operateur implements Noeud {
 			l = operateurs.get(s);
 		for (Operateur item : l)
 			if (o.estBinaire() == item.estBinaire())
-				throw new RuntimeException ("Il existe déjà un opérateur " + (o.estBinaire() ? "binaire" : "unaire") + " dont le symbole est " + o.getSymbole());
+				throw new RuntimeException ("Il existe dÃ©jÃ  un opÃ©rateur " + (o.estBinaire() ? "binaire" : "unaire") + " dont le symbole est " + o.getSymbole());
 		l.add(o);
 	}
 	
@@ -57,6 +64,25 @@ public abstract class Operateur implements Noeud {
 			if (o.estBinaire() == b)
 				return o;
 		return null;
+	}
+	public static Operateur getOperateur (String s){
+		List<Operateur> l = operateurs.get(s);
+		for (Operateur o : l)
+				return o;
+		return null;
+	}
+	
+	public static boolean hasOperateur (String s){
+		return operateurs.containsKey(s);
+	}
+	
+	public static void chargerOperateurs (){
+		Operateur.putOperateur(new Addition ());
+		Operateur.putOperateur(new Soustraction ());
+		Operateur.putOperateur(new Multiplication ());
+		Operateur.putOperateur(new Division ());
+		Operateur.putOperateur(new Oppose ());
+		Operateur.putOperateur(new Exponentiation ());
 	}
 	
 	public String toString (){
