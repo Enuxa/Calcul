@@ -2,7 +2,7 @@ package base;
 
 import java.util.*;
 
-public class Expression implements Operable<Expression> {
+public class Expression {
 	private Expression gauche, droite;
 	private Noeud valeur;
 	
@@ -26,6 +26,10 @@ public class Expression implements Operable<Expression> {
 		this (new Entier (n));
 	}
 	
+	public Expression (Fonction f, Expression[] args){
+		this (new FonctionOccurrence (f, args));
+	}
+	
 	public boolean estFeuille (){
 		return this.gauche == null && this.droite == null;
 	}
@@ -38,19 +42,6 @@ public class Expression implements Operable<Expression> {
 	}
 	public Noeud getValeur (){
 		return this.valeur;
-	}
-	@Override
-	public Expression oppose() {
-		return new Expression (null, this.clone(), Operateur.getOperateur("-", false));
-	}
-	@Override
-	public Expression additionner(Expression a) {
-		return new Expression (this.clone(), a, Operateur.getOperateur("+", true));
-	}
-	
-	@Override
-	public Expression multiplier(Expression a) {
-		return new Expression (this.clone(), a, Operateur.getOperateur("*", true));
 	}
 	
 	public Expression clone (){
@@ -81,20 +72,24 @@ public class Expression implements Operable<Expression> {
 		return this.toString(null, 0);
 	}
 
-	@Override
-	public Expression diviser(Expression a) {
-		return new Expression (this.clone(), a.clone(), Operateur.getOperateur("/", true));
-	}
-	
-	public static Expression build (String e){
-		TokenList list = new TokenList (e);
-		return list.build();
+	public static Expression build (String e, Map<String, Variable> variablesLiees){
+		TokenList list = new TokenList (e, variablesLiees.keySet());
+		return list.build(variablesLiees);
 	}
 	
 	public float evaluer (){
-		if (this.estFeuille())
-			return ((Constante)this.valeur).getValeur();
-		else{
+		return this.evaluer(null);
+	}
+	
+	public float evaluer (Map<Variable, Float> valeurs){
+		if (this.estFeuille()){
+			if (this.valeur instanceof Constante)
+				return ((Constante)this.valeur).getValeur();
+			else if (this.valeur instanceof Variable)
+				return valeurs.get(this.valeur);
+			else
+				return ((FonctionOccurrence)this.valeur).evaluer();
+		}else{
 			float d = this.droite.evaluer();
 			Operateur o = (Operateur)this.valeur;
 			return o.estBinaire() ? o.evaluer(this.gauche.evaluer(), d) : o.evaluer(d);
@@ -103,13 +98,13 @@ public class Expression implements Operable<Expression> {
 	
 	private static class TokenList {
 		private List<String> tokens;
-		public TokenList (String e){
+		public TokenList (String e, Collection<String> variablesLiees){
 			String s = "";
 			this.tokens = new ArrayList<String> ();
 			for (char c : e.toCharArray()){
 				String cs = Character.toString(c);
 				if (Operateur.hasOperateur(cs) || ConstanteFixe.hasConstante(cs)
-						|| cs.equals("(") || cs.equals(")")){
+						|| cs.equals("(") || cs.equals(")") || variablesLiees.contains(cs)){
 					this.add(s);
 					this.add(cs);
 					s = "";
@@ -126,9 +121,12 @@ public class Expression implements Operable<Expression> {
 			return this.tokens.toString();
 		}
 		public Expression build (){
-			return this.build(this.vuePropre (this.tokens, 0, this.tokens.size() - 1));
+			return this.build(null);
 		}
-		private Expression build (List<String> list){
+		public Expression build (Map<String, Variable> variablesLiees){
+			return this.build(this.vuePropre (this.tokens, 0, this.tokens.size() - 1), variablesLiees);
+		}
+		private Expression build (List<String> list, Map<String, Variable> variablesLiees){
 			int nbParentheses = 0;
 			Operateur dernierOperateur = null;
 			boolean continuer = true;
@@ -156,17 +154,27 @@ public class Expression implements Operable<Expression> {
 			//	Si on n'a rencontré aucun opérateur, on suppose qu'il n'y a qu'un seul token
 			if (i < 0 && dernierOperateur == null){
 				String token = list.get(0);
+				//	Constante
 				if (ConstanteFixe.hasConstante(token))
 					return new Expression (ConstanteFixe.getConstante(token));
-				else
+				//	Variable liée
+				if (variablesLiees.containsKey(token))
+					return new Expression (variablesLiees.get(token));
+				//	Fonction
+				else if (Fonction.hasFonction(token)){
+					List<List<String>> args = separerArguments (list.subList(2, list.size() - 1));
+					Expression[] argsex = new Expression [args.size()];
+					for (int j = 0; j < args.size(); j++)
+						argsex[j] = build (args.get(j), variablesLiees);
+					return new Expression (Fonction.getFonction(token, argsex.length), argsex);
+				}else
 					return new Expression (Integer.valueOf(token));
-				//TODO : Traiter le cas de la fonction
 			//	Si on a rencontré un opérateur
 			}else{
 				Expression gauche = null;
 				if (dernierOperateurIndice != 0)
-					gauche = this.build(this.vuePropre(list, 0, dernierOperateurIndice - 1));
-				Expression droite = this.build(this.vuePropre(list, dernierOperateurIndice + 1, list.size() - 1));
+					gauche = this.build(this.vuePropre(list, 0, dernierOperateurIndice - 1), variablesLiees);
+				Expression droite = this.build(this.vuePropre(list, dernierOperateurIndice + 1, list.size() - 1), variablesLiees);
 				
 				Operateur operateur = Operateur.getOperateur(dernierOperateur.getSymbole(), gauche != null);
 				
@@ -194,6 +202,27 @@ public class Expression implements Operable<Expression> {
 					continuer = false;
 			}
 			return liste;
+		}
+		private List<List<String>> separerArguments (List<String> liste){
+			List<List<String>> args = new ArrayList<List<String>>();
+			int n = 0, debut = 0;
+			
+			for (int i = 0; i < liste.size(); i++){
+				String token = liste.get(i);
+				if (token.equals("("))
+					n++;
+				else if (token.equals(")"))
+					n--;
+				else if (token.equals(",") && n == 0){
+					args.add(liste.subList(debut, i));
+					debut = i + 1;
+				}
+			}
+			
+			if (debut < liste.size())
+				args.add(liste.subList(debut, liste.size()));
+			
+			return args;
 		}
 	}
 }

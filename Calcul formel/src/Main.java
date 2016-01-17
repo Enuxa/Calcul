@@ -6,11 +6,17 @@ public class Main {
 	public static void main(String[] args) {
 		Operateur.chargerOperateurs();
 		ConstanteFixe.chargerConstantes();
+		Fonction.chargerFonctions();
 				
 		Scanner sc = new Scanner (System.in);
-		
+
+		Map<String, Variable> vl = new HashMap<String, Variable> ();
+		vl.put("x", new Variable ("x"));
+
 		while (true){
-			Expression exp = Expression.build(sc.nextLine());
+			String line = sc.nextLine();
+			Expression exp = Expression.build(line, vl);
+			Fonction f = new Fonction (f, exp, vl.);
 			System.out.println(exp + "=" + exp.evaluer());
 		}
 	}
