@@ -8,7 +8,7 @@ Pour une expression *E*, après l'avoir décomposée en tokens et supprimé les 
 
  - hors parenthèses
  
- - qui n'admette pas d'opérateurs de priorité strictement inférieure à sa gauche (_ex :_ dans `7+2*12*(2*(7+2))` un tel opérateur est le premier `+`, dans `7+2-12*(2*(7+2))` il s'agit du `-` et dans `(2+5)*(4+2)*2^(9*(7-1))` c'est le premier `*`). Le fait qu'il n'admette pas d'opérateurs de priorité strictement inférieure à sa gauche permet de régler le problème de l'associativité, par exemple dans le cas de `1-1-1`, on ne peut pas la considérer comme `(1)-(1-1)` car la soustraction n'est pas associative, mais on peut effectivement la voir comme `(1-1)-(1)`, de même pour la division : `1/2/3` (bien que cette écriture soit ambiguë) elle se calcule de gauche à droite et vaut $\frac{1}{6}$, pas $\frac{3}{2}$.
+ - qui n'admette pas d'opérateurs de priorité strictement inférieure à sa gauche (_ex :_ dans `7+2*12*(2*(7+2))` un tel opérateur est le premier `+`, dans `7+2-12*(2*(7+2))` il s'agit du `-` et dans `(2+5)*(4+2)*2^(9*(7-1))` c'est le premier `*`). Le fait qu'il n'admette pas d'opérateurs de priorité strictement inférieure à sa gauche permet de régler le problème de l'associativité, par exemple dans le cas de `1-1-1`, on ne peut pas la considérer comme `(1)-(1-1)` car la soustraction n'est pas associative, mais on peut effectivement la voir comme `(1-1)-(1)`, de même pour la division : `1/2/3` (bien que cette écriture soit ambiguë) elle se calcule de gauche à droite et vaut 1/6, pas 3/2
 
 Ce qui nous laisse face à deux cas possibles :
 
