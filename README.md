@@ -1,5 +1,8 @@
 # Calcul
 
+**A faire :** 
+ - Classe `Contexte` correspondant aux variables libres et aux variables liées
+
 ##Description de l'algorithme récursif
 Pour une expression *E*, après l'avoir décomposée en tokens et supprimé les parenthèses extérieures inutiles, on parcourt les tokens de droite à gauche jusqu'à trouver un opérateur :
 
@@ -14,4 +17,3 @@ Ce qui nous laisse face à deux cas possibles :
  - Cet opérateur n'existe pas, c'est donc que `E` est une valeur "primitive" (*i.e.* une constante, une variable, ou en terme d'arbre : une feuille). Ce nœud est alors la feuille avec comme valeur celle décrite par `E`.
 
 *Remarque :* Les *tokens* sont les éléments de bases de l'expression (les opérateurs, les nombres, les parenthèses, ...), par exemple la suite de tokens associée à l'expression `(1+2)-3^5/(7-2)` est `(,1,+,2,),-,3,^,5,/,(,7,-,2,)`.
-

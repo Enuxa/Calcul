@@ -12,7 +12,7 @@ public class Exponentiation extends Operateur{
 
 	@Override
 	public float evaluer(float a, float b) {
-		return (float)Math.exp(Math.log(a) * b);
+		return (float)Math.pow(a, b);
 	}
 	
 }
