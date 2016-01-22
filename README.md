@@ -1,5 +1,9 @@
 # Calcul
 
+##A faire
+
+ - Vérifier que les arguments sont de longeur 1
+
 ##Description de l'algorithme récursif
 Pour une expression *E*, après l'avoir décomposée en tokens et supprimé les parenthèses extérieures inutiles, on parcourt les tokens de droite à gauche jusqu'à trouver un opérateur :
 
