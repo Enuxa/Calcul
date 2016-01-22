@@ -17,4 +17,7 @@ public class Variable extends Nombre {
 	public Constante getValeur (){
 		return this.valeur;
 	}
+	public String toString (){
+		return this.symbole;
+	}
 }

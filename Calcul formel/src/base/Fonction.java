@@ -5,33 +5,9 @@ import java.util.*;
 public class Fonction {
 	private static Map<String, List<Fonction>> fonctions = new HashMap<String, List<Fonction>> ();
 	private String symbole;
-	private Expression expression;
-	private List<Variable> variables;
 	private int argumentNb;
-	public Fonction (String symbole, Expression e, List<Variable> variables){
-		this.expression = e;
-		this.variables = variables;
-		this.symbole = symbole;
-		this.argumentNb = variables.size();
-	}
-	public Fonction (String symbole, String expression, List<Variable> variables){
-		this (symbole, Expression.build(expression, listToMap (variables)), variables);
-	}
-	public Fonction (String symbole, String expression, Map<String, Variable> variables){
-		this (symbole, Expression.build(expression, variables), variables);
-	}
-	private static Map<String, Variable> listToMap (List<Variable> l){
-		Map<String, Variable> m = new HashMap<String, Variable> ();
-		for (Variable v : l)
-			m.put(v.toString(), v);
-		return m;
-	}
-	public Fonction (String symbole, int argumentNb){
-		this.symbole = symbole;
-		this.argumentNb = argumentNb;
-		this.expression = null;
-		this.variables = null;
-	}
+	private Expression expression;
+	private List<Variable> arguments;
 	
 	public String getSymbole (){
 		return this.symbole;
@@ -41,11 +17,25 @@ public class Fonction {
 		return this.argumentNb;
 	}
 	
+	public Fonction (String symbole, int argumentNb){
+		this.symbole = symbole;
+		this.argumentNb = argumentNb;
+	}
+	
+	public Fonction (String symbole, Expression expression, List<Variable> arguments){
+		this.symbole = symbole;
+		this.expression = expression;
+		this.arguments = arguments;
+		if (arguments != null)
+			this.argumentNb = arguments.size ();
+		else
+			this.argumentNb = 0;
+	}
+	
 	public float evaluer (float[] args){
-		Map<Variable, Float> valeurs = new HashMap <Variable, Float> ();
 		for (int i = 0; i < this.argumentNb; i++)
-			valeurs.put(this.variables.get(i), args[i]);
-		return this.expression.evaluer(valeurs);
+			this.arguments.get(i).setValeur(new ConstanteFixe ("", args[i]));
+		return this.expression.evaluer();
 	}
 	
 	public static void putFonction (Fonction f){
@@ -58,7 +48,7 @@ public class Fonction {
 			l = fonctions.get(s);
 		for (Fonction item : l)
 			if (f.getArgumentNb() == item.getArgumentNb())
-				throw new RuntimeException ("Il existe d�j� une fonction " + f + " avec " + f.getArgumentNb() + " arguments.");
+				throw new RuntimeException ("Il existe déjà une fonction " + f + " avec " + f.getArgumentNb() + " arguments.");
 		l.add(f);
 	}
 	
@@ -103,6 +93,18 @@ public class Fonction {
 		putFonction (new Fonction("ln", 1) {
 			public float evaluer (float[] args){
 				return (float)Math.log(args[0]);
+			}
+		});
+		//	Fonction racine carrée
+		putFonction (new Fonction("sqrt", 1) {
+			public float evaluer (float[] args){
+				return (float)Math.sqrt(args[0]);
+			}
+		});
+		//	Fonction racine n-ième
+		putFonction (new Fonction("root", 2) {
+			public float evaluer (float[] args){
+				return (float)Math.pow(args[1], 1f/args[0]);
 			}
 		});
 	}

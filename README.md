@@ -1,8 +1,5 @@
 # Calcul
 
-**A faire :** 
- - Classe `Contexte` correspondant aux variables libres et aux variables liées
-
 ##Description de l'algorithme récursif
 Pour une expression *E*, après l'avoir décomposée en tokens et supprimé les parenthèses extérieures inutiles, on parcourt les tokens de droite à gauche jusqu'à trouver un opérateur :
 
