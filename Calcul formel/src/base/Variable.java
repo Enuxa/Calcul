@@ -1,3 +1,4 @@
+
 package base;
 
 public class Variable extends Nombre {
