@@ -33,4 +33,7 @@ public abstract class Util {
 		}
 		return v;
 	}
+
+	public static Expression separerProduit(Expression e, ConstanteFixe pi) {
+	}
 }

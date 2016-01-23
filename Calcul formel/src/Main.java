@@ -33,6 +33,8 @@ public class Main {
 				Expression exp = Expression.build(line, c);
 				System.out.println(exp + "=" + exp.evaluer());
 			}
+			
+			sc.close();
 		}
 	}
 

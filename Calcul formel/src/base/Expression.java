@@ -162,6 +162,62 @@ public class Expression {
 	}
 	
 	/**
+	 * Remplace dans une expression une certaine variable.
+	 * @param variable La variable à remplacer.
+	 * @param expression L'expression par laquelle remplacer la variable.
+	 * @return La nouvelle expression.
+	 */
+	public Expression remplacer (Variable variable, Expression expression){
+		Contexte c = new Contexte (this.contexte);
+		c.retirer(variable);
+		return this.remplacer_rec(variable, expression, c);
+	}
+	
+	/**
+	 * Remplace récursivement une variable par une expression.
+	 * @param variable La variable à remplacer.
+	 * @param expression L'expression par laquelle remplacer la variable.
+	 * @param contexte Le contexte actuel.
+	 * @return La nouevelle expression.
+	 */
+	private Expression remplacer_rec (Variable variable, Expression expression, Contexte contexte){
+		Expression g = null, d = null;
+		if (this.gauche != null)
+			g = this.gauche.remplacer_rec(variable, expression, contexte);
+		if (this.droite != null)
+			g = this.droite.remplacer_rec(variable, expression, contexte);
+		if (this.estFeuille()){
+			if (this.valeur == variable)
+				return expression.clone();
+			else
+				return this.clone();
+		}else{
+			Noeud n = this.valeur;
+			if (this.valeur instanceof Entier)
+				n = new Entier ((int)((Entier)this.valeur).getValeur());
+			return new Expression (g, d, n, contexte);
+		}
+	}
+	
+	/**
+	 * Indique si cette expression contient une certaine constante ou variable.
+	 * @param x La constante ou variable considérée.
+	 * @return <code>true</code> si cette expression contient ce nombre.
+	 */
+	public boolean contient (Nombre x){
+		boolean g = false, d = false;
+		if (x instanceof ConstanteFixe || x instanceof Variable){
+			if (this.gauche != null)
+				g = this.gauche.contient(x);
+			if (this.droite != null)
+				d = this.droite.contient(x);
+			if (this.estFeuille())
+				return this.valeur == x;
+		}
+		return g || d;
+	}
+	
+	/**
 	 * Classe correspondant à la décomposition en tokens d'une chaîne de caractères représentant une expression.
 	 * @author Pierre
 	 */

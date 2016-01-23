@@ -83,6 +83,15 @@ public class Contexte {
 	}
 	
 	/**
+	 * Retire une variable du contexte
+	 * @param variable La variable à retirer.
+	 */
+	public void retirer (Variable variable){
+		if (this.variables.containsValue(variable))
+			this.variables.remove(variable);
+	}
+	
+	/**
 	 * Récupère les variables.
 	 * @return Les variables du contexte.
 	 */
